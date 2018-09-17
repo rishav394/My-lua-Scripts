@@ -1,18 +1,47 @@
 local Rune = {}
 
-Rune.Enable = Menu.AddOption({ "Utility", "Bounty Rune Notification" }, "Chatwheel Enable", "Turn it on if you want it to say Rune Check in ChatWheel")
-Rune.Time = Menu.AddOption({"Utility", "Bounty Rune Notification"}, "Time At", "The time tick in seconds in which the Notification wil be sent", 30, 58, 2)
+Rune.Options  = {}
+
+function Rune.InsertData(alias)
+    table.insert(Rune.Options, { name = alias})
+end
+
+Rune.InsertData("Chatwheel")
+Rune.InsertData("Alert")
+Rune.InsertData("ChatWheel + Alert")
+
+
+Rune.OverAll = Menu.AddOption({ "Utility", "Bounty Rune Notification" }, "Overall Enabled", "Turn the script on or off (RECOMMENDED: ON)")
+Rune.MyOptions = Menu.AddOption({ "Utility", "Bounty Rune Notification" }, "Mode", "Set the notification Mode  (RECOMMENDED: CHATWHEEL + ALERT)", 1, #Rune.Options, 1)
+Rune.Time = Menu.AddOption({"Utility", "Bounty Rune Notification"}, "Notification at (time in seconds)", "The time tick in seconds in which the Notification wil be sent  (RECOMMENDED: 50)", 30, 58, 2)
+Rune.DisableTime = Menu.AddOption({"Utility", "Bounty Rune Notification"}, "Time in minutes to stop script", "The minute mark at which the script auto disables  (RECOMMENDED: 35)", 25, 60, 5)
+
+for i, v in ipairs(Rune.Options) do
+    Menu.SetValueName(Rune.MyOptions, i, v.name)
+end
 
 function Rune.OnUpdate()
-	if Menu.IsEnabled(Rune.Enable) then
-		local time = (GameRules.GetGameTime() - GameRules.GetGameStartTime()) % 300
-		if time > 240 + Menu.GetValue(Rune.Time) and time < 240 + Menu.GetValue(Rune.Time) + 1 then
+	if not Menu.IsEnabled(Rune.OverAll) then
+		return
+	end
+
+	local gametime = (GameRules.GetGameTime() - GameRules.GetGameStartTime())
+	local time = gametime % 300
+
+	if gametime > Rune.DisableTime * 60 then
+		return;
+	end
+	
+	if time > 240 + Menu.GetValue(Rune.Time) and time < 240 + Menu.GetValue(Rune.Time) + 1 then
+		-- Act notifiations Accordingly
+		local value = Menu.GetValue(Rune.MyOptions)
+		if value == 1 then
 			Engine.ExecuteCommand("chatwheel_say 58")
-		end
-	else
-		local time = (GameRules.GetGameTime() - GameRules.GetGameStartTime()) % 300
-		if time > 240 + Menu.GetValue(Rune.Time) and time < 240 + Menu.GetValue(Rune.Time) + 1 then
-			Alerts.Add("Check Bounty Runes", 5 , true)
+		elseif value == 2 then
+			Alerts.Add("Check Bounty Runes", 4 , true)
+		else
+			Engine.ExecuteCommand("chatwheel_say 58")
+			Alerts.Add("Check Bounty Runes", 4 , true)
 		end
 	end
 end

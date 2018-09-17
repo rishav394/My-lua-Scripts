@@ -27,7 +27,6 @@ end
 AutoDodger.InsertIgnoredProjectile("tinker_machine")
 AutoDodger.InsertIgnoredProjectile("weaver_swarm_projectile")
 AutoDodger.InsertIgnoredProjectile("kunkka_ghost_ship")
-AutoDodger.InsertIgnoredProjectile("mirana_sacred_arrow")
 
 function AutoDodger.Reset()
     if not AutoDodger.canReset then return end
